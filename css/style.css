@@ -255,6 +255,8 @@ svg { width: 20px; height: 20px; display: block; }
 .pager-btn svg { width: 17px; height: 17px; }
 .pager-btn:hover { border-color: var(--accent); color: var(--accent); }
 #nextBtn { margin-left: auto; }
+.page-ind { flex: 1; text-align: center; align-self: center; color: var(--text-muted); font-family: var(--mono); font-size: 0.85rem; letter-spacing: 0.04em; }
+.page-ind[hidden] { display: none; }
 [data-view="landing"] .pager { display: none; }
 .site-footer { max-width: 760px; margin: 56px auto 0; padding-top: 22px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.85rem; text-align: center; }
 

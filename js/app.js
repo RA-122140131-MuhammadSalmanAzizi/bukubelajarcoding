@@ -232,30 +232,52 @@ function renderHome() {
   renderRoadmap("python");
   el("prevBtn").hidden = true;
   el("nextBtn").hidden = true;
+  if (el("pageInd")) el("pageInd").hidden = true;
   setActive(null);
   window.scrollTo(0, 0);
 }
 
-/* ---------- Muat pelajaran ---------- */
-async function loadLesson(langId, lessonId) {
+/* ---------- Muat pelajaran (dengan paging per-bab) ---------- */
+let LESSON = { key: null, pages: [] };
+
+// Pisah materi jadi halaman berdasar penanda <!--page-->
+function splitPages(md) {
+  return md.split(/^\s*<!--\s*page\s*-->\s*$/m).map((s) => s.trim()).filter(Boolean);
+}
+
+async function loadLesson(langId, lessonId, page) {
   const lang = BOOK.find((l) => l.id === langId);
   const lesson = lang && lang.pelajaran.find((p) => p.id === lessonId);
   if (!lesson) { renderHome(); return; }
 
   document.body.dataset.view = "app";
-  article.innerHTML = `<p style="color:var(--text-muted)">Memuat…</p>`;
-  try {
-    const res = await fetch(`content/${langId}/${lessonId}.md`);
-    if (!res.ok) throw new Error(res.status);
-    const md = await res.text();
-    article.innerHTML = `<div class="lesson-meta">${lang.nama}</div>` + MD.render(md);
-    document.title = `${lesson.judul} — Buku Belajar Coding`;
-  } catch (e) {
-    article.innerHTML = `<h1>Materi belum tersedia</h1><p>Pelajaran ini sedang disiapkan. Silakan pilih pelajaran lain dari menu.</p>`;
+  const key = `${langId}/${lessonId}`;
+
+  // Ambil & cache isi bab; kalau pindah halaman di bab yang sama, tak perlu fetch ulang
+  if (LESSON.key !== key) {
+    article.innerHTML = `<p style="color:var(--text-muted)">Memuat…</p>`;
+    try {
+      const res = await fetch(`content/${langId}/${lessonId}.md`);
+      if (!res.ok) throw new Error(res.status);
+      LESSON = { key, pages: splitPages(await res.text()) };
+    } catch (e) {
+      LESSON = { key, pages: [] };
+    }
   }
 
-  setActive(`${langId}/${lessonId}`);
-  buildPager(langId, lessonId);
+  const total = LESSON.pages.length || 1;
+  const cur = Math.min(Math.max(parseInt(page) || 1, 1), total);
+
+  if (LESSON.pages.length) {
+    const meta = total > 1 ? `${lang.nama} &middot; Halaman ${cur} dari ${total}` : lang.nama;
+    article.innerHTML = `<div class="lesson-meta">${meta}</div>` + MD.render(LESSON.pages[cur - 1]);
+  } else {
+    article.innerHTML = `<h1>Materi belum tersedia</h1><p>Pelajaran ini sedang disiapkan. Silakan pilih pelajaran lain dari menu.</p>`;
+  }
+  document.title = `${lesson.judul} — Buku Belajar Coding`;
+
+  setActive(key);
+  buildPager(langId, lessonId, cur, total);
   const listAktif = nav.querySelector(`.nav-lessons[data-lang="${langId}"]`);
   if (listAktif && !listAktif.classList.contains("open")) {
     listAktif.classList.add("open");
@@ -271,14 +293,27 @@ function setActive(key) {
   });
 }
 
-function buildPager(langId, lessonId) {
+function buildPager(langId, lessonId, cur, total) {
   const idx = FLAT.findIndex((f) => f.langId === langId && f.lessonId === lessonId);
-  const prev = FLAT[idx - 1];
-  const next = FLAT[idx + 1];
-  el("prevBtn").hidden = !prev;
-  el("nextBtn").hidden = !next;
-  if (prev) el("prevBtn").onclick = () => { location.hash = `${prev.langId}/${prev.lessonId}`; };
-  if (next) el("nextBtn").onclick = () => { location.hash = `${next.langId}/${next.lessonId}`; };
+  const prevBtn = el("prevBtn");
+  const nextBtn = el("nextBtn");
+  const ind = el("pageInd");
+
+  // Sebelumnya: halaman sebelumnya di bab ini, atau bab sebelumnya
+  let prevHash = null;
+  if (cur > 1) prevHash = `${langId}/${lessonId}/${cur - 1}`;
+  else if (FLAT[idx - 1]) prevHash = `${FLAT[idx - 1].langId}/${FLAT[idx - 1].lessonId}`;
+  prevBtn.hidden = !prevHash;
+  if (prevHash) prevBtn.onclick = () => { location.hash = prevHash; };
+
+  // Selanjutnya: halaman berikutnya di bab ini, atau bab berikutnya
+  let nextHash = null;
+  if (cur < total) nextHash = `${langId}/${lessonId}/${cur + 1}`;
+  else if (FLAT[idx + 1]) nextHash = `${FLAT[idx + 1].langId}/${FLAT[idx + 1].lessonId}`;
+  nextBtn.hidden = !nextHash;
+  if (nextHash) nextBtn.onclick = () => { location.hash = nextHash; };
+
+  if (ind) { ind.textContent = total > 1 ? `${cur} / ${total}` : ""; ind.hidden = total <= 1; }
 }
 
 /* ---------- Tombol salin kode ---------- */
@@ -344,8 +379,8 @@ el("feedbackForm").addEventListener("submit", (e) => {
 function route() {
   const hash = location.hash.replace(/^#/, "");
   if (!hash) { renderHome(); return; }
-  const [langId, lessonId] = hash.split("/");
-  if (langId && lessonId) loadLesson(langId, lessonId);
+  const [langId, lessonId, pageStr] = hash.split("/");
+  if (langId && lessonId) loadLesson(langId, lessonId, pageStr);
   else renderHome();
 }
 window.addEventListener("hashchange", route);

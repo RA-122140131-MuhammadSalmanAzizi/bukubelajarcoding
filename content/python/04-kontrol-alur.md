@@ -1,40 +1,52 @@
 # Percabangan & Perulangan
 
-Bagian ini membuat program bisa "mengambil keputusan" dan "mengulang" pekerjaan.
+Bagian ini membuat program bisa "mengambil keputusan" (percabangan) dan "mengulang pekerjaan" (perulangan). Ini inti dari hampir semua program.
 
-## Percabangan: if / elif / else
+## Percabangan: if
+
+`if` menjalankan blok kode hanya jika sebuah kondisi benar:
+
+```python
+umur = 20
+
+if umur >= 18:
+    print("dewasa")
+```
+
+Perhatikan dua hal penting:
+- Setelah kondisi ada tanda **titik dua** `:`.
+- Baris di dalam `if` **menjorok** (indentasi 4 spasi). Indentasi inilah yang menandai "ini bagian dari if".
+
+### if / elif / else
 
 ```python
 umur = 20
 
 if umur < 13:
     print("anak-anak")
-elif umur < 18:
+elif umur < 18:            # else if: dicek kalau if di atas salah
     print("remaja")
 elif umur < 60:
     print("dewasa")
-else:
+else:                      # kalau semua di atas salah
     print("lansia")
 ```
 
-> Penting: Python memakai **indentasi** (biasanya 4 spasi) untuk menandai blok kode di dalam `if`. Salah indentasi akan menyebabkan error.
+Python mengecek dari atas ke bawah dan menjalankan **blok pertama** yang kondisinya benar, lalu berhenti.
 
-### If versi singkat (ternary)
+### if versi singkat (ternary)
+
+Untuk kasus sederhana, satu baris cukup:
 
 ```python
 status = "dewasa" if umur >= 18 else "belum dewasa"
 ```
 
-### Rantai perbandingan
-
-```python
-if 0 <= nilai <= 100:
-    print("nilai valid")
-```
+<!--page-->
 
 ## Perulangan: for
 
-Dipakai untuk mengulang sesuatu yang jumlahnya diketahui atau bisa di-loop.
+`for` dipakai untuk mengulang sesuatu yang bisa di-loop (list, teks, `range`).
 
 ```python
 # mengulang isi list
@@ -44,12 +56,18 @@ for buah in ["apel", "mangga", "jeruk"]:
 # mengulang deret angka dengan range
 for i in range(5):        # 0, 1, 2, 3, 4
     print(i)
-
-range(2, 8)      # 2 sampai 7
-range(0, 10, 2)  # 0, 2, 4, 6, 8 (loncat 2)
 ```
 
-Mengulang sambil menomori dengan `enumerate`:
+Variasi `range`:
+
+```python
+range(5)          # 0,1,2,3,4
+range(2, 8)       # 2,3,4,5,6,7  (mulai 2 sampai sebelum 8)
+range(0, 10, 2)   # 0,2,4,6,8    (loncat 2)
+range(5, 0, -1)   # 5,4,3,2,1    (mundur)
+```
+
+Mengulang sambil mendapat nomor urut dengan `enumerate`:
 
 ```python
 for nomor, buah in enumerate(["apel", "mangga"], start=1):
@@ -58,35 +76,41 @@ for nomor, buah in enumerate(["apel", "mangga"], start=1):
 # 2 mangga
 ```
 
+<!--page-->
+
 ## Perulangan: while
 
-Mengulang **selama** syarat masih benar. Cocok saat tidak tahu pasti kapan berhenti.
+`while` mengulang **selama** kondisi masih benar. Cocok saat kita tidak tahu pasti berapa kali harus mengulang.
 
 ```python
 angka = 5
 while angka > 0:
     print(angka)
-    angka -= 1     # WAJIB mengubah syarat, agar loop berhenti
+    angka -= 1     # WAJIB mengubah nilai, agar loop berhenti
 ```
 
-> Hati-hati: jika lupa mengubah nilai yang diuji, loop akan berjalan selamanya (infinite loop). Tekan Ctrl+C di terminal untuk menghentikannya paksa.
+> Hati-hati: jika lupa mengubah nilai yang diuji (misalnya lupa `angka -= 1`), kondisi tidak pernah menjadi salah, dan loop berjalan **selamanya** (infinite loop). Tekan Ctrl+C di terminal untuk menghentikannya paksa.
 
-### Pola menu dengan while True dan break
+### Pola Menu: while True + break
 
 ```python
 while True:
     perintah = input("Ketik q untuk keluar: ")
     if perintah == "q":
         break              # keluar paksa dari loop
-    print(f"Kamu ketik: {perintah}")
+    print(f"Kamu mengetik: {perintah}")
 ```
 
-## break dan continue
+`while True` mengulang tanpa henti, sampai bertemu `break` yang memaksa keluar. Pola ini dipakai untuk menu interaktif.
+
+<!--page-->
+
+## break, continue, dan pass
 
 ```python
 for i in range(10):
     if i == 3:
-        continue      # lewati sisa, lanjut putaran berikutnya
+        continue      # lewati sisa baris, lanjut ke putaran berikutnya
     if i == 6:
         break         # keluar total dari loop
     print(i)          # 0, 1, 2, 4, 5
@@ -96,11 +120,30 @@ for i in range(10):
 |------|------|
 | `break` | keluar total dari loop |
 | `continue` | lompat ke putaran berikutnya |
-| `pass` | tidak melakukan apa-apa (placeholder) |
+| `pass` | tidak melakukan apa-apa (pengisi tempat) |
+
+## Perulangan Bersarang (Nested Loop)
+
+Loop di dalam loop, misalnya untuk membuat tabel:
+
+```python
+for i in range(1, 4):
+    for j in range(1, 4):
+        print(f"{i}x{j}={i*j}", end="  ")
+    print()   # pindah baris setelah tiap i
+```
+
+## Kesalahan Umum
+
+- Lupa tanda titik dua `:` setelah `if`, `for`, atau `while`.
+- Salah indentasi sehingga baris tidak masuk ke blok yang benar.
+- Lupa mengubah nilai di `while`, menyebabkan infinite loop.
 
 ## Ringkasan
 
-- `if / elif / else` untuk percabangan; indentasi menentukan blok.
+- `if / elif / else` untuk percabangan; indentasi menandai blok.
 - `for` mengulang isi koleksi atau `range`; `enumerate` menambah nomor urut.
-- `while` mengulang selama syarat benar; awas infinite loop.
+- `while` mengulang selama kondisi benar; awas infinite loop.
 - `break` keluar dari loop, `continue` lompat ke putaran berikutnya.
+
+> Latihan: buat program yang menampilkan angka 1 sampai 20, tetapi untuk kelipatan 3 tampilkan kata "Fizz" alih-alih angkanya.

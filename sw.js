@@ -2,7 +2,7 @@
    Service Worker — bikin app bisa dibuka offline (PWA)
    ============================================================ */
 
-const CACHE = "bbc-v7";
+const CACHE = "bbc-v8";
 
 // Berkas inti yang dipracache saat install
 const CORE = [
