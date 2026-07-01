@@ -1,6 +1,6 @@
 /* ============================================================
    Buku Belajar Coding — logika aplikasi (SPA)
-   Navigasi, tema, routing hash, load materi, modal, PWA.
+   Landing (tanpa sidebar) + tampilan belajar (dengan sidebar).
    ============================================================ */
 
 const DEV_EMAIL = "salman06az@gmail.com";
@@ -17,7 +17,7 @@ const ICONS = {
 const FEATURES = [
   { t: "Responsif", d: "Nyaman dibaca di ponsel maupun desktop.", i: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="2" y="2" rx="2"/><path d="M14 2v20"/><path d="M18 8h4v10a2 2 0 0 1-2 2h-2"/></svg>' },
   { t: "Bisa Offline", d: "Terpasang seperti aplikasi & jalan tanpa internet.", i: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>' },
-  { t: "Tema Terang & Gelap", d: "Pilih tampilan yang paling nyaman di matamu.", i: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/><path d="M12 9a3 3 0 0 0 0 6" fill="currentColor" stroke="none"/></svg>' },
+  { t: "Tema Terang & Gelap", d: "Pilih tampilan yang paling nyaman di matamu.", i: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/></svg>' },
   { t: "Pencarian Cepat", d: "Temukan pelajaran langsung dari sidebar.", i: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>' },
 ];
 
@@ -32,11 +32,13 @@ const el = (id) => document.getElementById(id);
 const nav = el("nav");
 const article = el("article");
 
-/* ---------- Logo: fallback ke ikon SVG jika gambar tak ada ---------- */
+/* ---------- Logo topbar: fallback ke ikon jika gambar tak ada ---------- */
 const brandLogo = el("brandLogo");
 if (brandLogo) {
   brandLogo.addEventListener("error", () => {
-    el("brandMark").innerHTML = ICONS.code;
+    const m = el("brandMark");
+    m.classList.add("fallback");
+    m.innerHTML = ICONS.code;
   });
 }
 
@@ -62,7 +64,7 @@ function closeSidebar() { el("sidebar").classList.remove("open"); el("overlay").
 el("menuBtn").addEventListener("click", openSidebar);
 el("overlay").addEventListener("click", closeSidebar);
 
-/* ---------- Bangun navigasi ---------- */
+/* ---------- Bangun navigasi sidebar ---------- */
 function buildNav() {
   nav.innerHTML = "";
   BOOK.forEach((lang) => {
@@ -100,56 +102,85 @@ function buildNav() {
   });
 }
 
-/* ---------- Beranda / Landing ---------- */
+/* ---------- Roadmap berkelok ---------- */
+function roadmapHTML(lang) {
+  const n = lang.pelajaran.length;
+  let h = `<div class="path">`;
+  lang.pelajaran.forEach((p, i) => {
+    const side = i % 2 === 0 ? "left" : "right";
+    const judul = p.judul.replace(/^\d+\.\s*/, "");
+    h +=
+      `<div class="pstep ${side}">` +
+      `<button class="pnode" style="--c:${lang.color}" data-lang="${lang.id}" data-lesson="${p.id}">` +
+      `<span class="pnum">${i + 1}</span><span class="ptitle">${judul}</span></button></div>`;
+    if (i < n - 1) {
+      const d = i % 2 === 0 ? "M29 2 C29 34 71 14 71 46" : "M71 2 C71 34 29 14 29 46";
+      h +=
+        `<div class="pconn"><svg viewBox="0 0 100 48" preserveAspectRatio="none">` +
+        `<path d="${d}" fill="none" stroke="${lang.color}" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="1 8"/></svg></div>`;
+    }
+  });
+  return h + `</div>`;
+}
+
+function renderRoadmap(langId) {
+  const lang = BOOK.find((l) => l.id === langId);
+  document.querySelectorAll(".lang-tab").forEach((t) => t.classList.toggle("active", t.dataset.lang === langId));
+
+  const area = el("roadmapArea");
+  area.innerHTML =
+    `<div class="roadmap-info"><h3>${lang.nama}</h3><p>${lang.deskripsi}</p>` +
+    `<div class="start-lang"><button class="btn-primary" data-start="${langId}">Mulai ${lang.nama}</button></div></div>` +
+    roadmapHTML(lang);
+
+  area.querySelectorAll(".pnode").forEach((b) =>
+    b.addEventListener("click", () => { location.hash = `${b.dataset.lang}/${b.dataset.lesson}`; })
+  );
+  area.querySelector("[data-start]").addEventListener("click", () => {
+    location.hash = `${langId}/${lang.pelajaran[0].id}`;
+  });
+}
+
+/* ---------- Landing / Beranda ---------- */
 function renderHome() {
   document.title = "Buku Belajar Coding";
+  document.body.dataset.view = "landing";
 
   const fitur = FEATURES.map(
-    (f) => `<div class="feature"><span class="f-icon">${f.i}</span><div><h4>${f.t}</h4><p>${f.d}</p></div></div>`
+    (f) => `<div class="feature-item"><span class="f-icon">${f.i}</span><h4>${f.t}</h4><p>${f.d}</p></div>`
   ).join("");
 
-  const kartu = BOOK.map(
-    (lang) =>
-      `<button class="lang-card" style="--c:${lang.color}" data-lang="${lang.id}">` +
-      `<span class="lang-badge" style="--c:${lang.color}">${lang.mark}</span>` +
-      `<h3>${lang.nama}</h3><p>${lang.deskripsi}</p>` +
-      `<span class="count">${lang.pelajaran.length} pelajaran</span></button>`
+  const tabs = BOOK.map(
+    (l) =>
+      `<button class="lang-tab" style="--c:${l.color}" data-lang="${l.id}">` +
+      `<span class="lang-badge" style="--c:${l.color}">${l.mark}</span>${l.nama}</button>`
   ).join("");
-
-  const roadmap = BOOK.map((lang) => {
-    const steps = lang.pelajaran
-      .map((p) => `<li data-lang="${lang.id}" data-lesson="${p.id}">${p.judul}</li>`)
-      .join("");
-    return (
-      `<div class="roadmap-col" style="--c:${lang.color}">` +
-      `<div class="roadmap-head"><span class="lang-badge" style="--c:${lang.color}">${lang.mark}</span><h3>${lang.nama}</h3></div>` +
-      `<ol class="roadmap-steps">${steps}</ol></div>`
-    );
-  }).join("");
 
   article.innerHTML =
-    `<section class="hero">` +
-    `<div class="eyebrow">Belajar Pemrograman</div>` +
-    `<h1>Satu buku, banyak bahasa.</h1>` +
-    `<p>Materi pemrograman dalam Bahasa Indonesia yang ringkas dan langsung ke inti. ` +
-    `Mulai dari nol, satu pelajaran demi satu pelajaran.</p></section>` +
+    `<section class="landing-hero">` +
+    `<div class="landing-logo"><img src="aset/logo.png" alt="Logo Buku Belajar Coding" /></div>` +
+    `<h1>Buku Belajar Coding</h1>` +
+    `<p class="tagline">Belajar Python, JavaScript, C++, dan lainnya dalam Bahasa Indonesia — ringkas, langsung ke inti, dari nol.</p>` +
+    `<div class="landing-cta"><button class="btn-primary lg" id="startBtn">Mulai Belajar</button></div>` +
+    `</section>` +
     `<div class="section-label">Kenapa Buku Ini</div>` +
-    `<div class="feature-grid">${fitur}</div>` +
-    `<div class="section-label">Pilih Bahasa</div>` +
-    `<div class="lang-grid">${kartu}</div>` +
-    `<div class="section-label">Roadmap Belajar</div>` +
-    `<div class="roadmap">${roadmap}</div>`;
+    `<div class="feature-row">${fitur}</div>` +
+    `<div class="section-label">Pilih Bahasa &amp; Roadmap</div>` +
+    `<div class="roadmap-wrap"><div class="lang-tabs">${tabs}</div><div id="roadmapArea"></div></div>`;
 
-  article.querySelectorAll(".lang-card").forEach((c) => {
-    c.addEventListener("click", () => {
-      const first = BOOK.find((l) => l.id === c.dataset.lang).pelajaran[0];
-      location.hash = `${c.dataset.lang}/${first.id}`;
-    });
-  });
-  article.querySelectorAll(".roadmap-steps li").forEach((li) => {
-    li.addEventListener("click", () => { location.hash = `${li.dataset.lang}/${li.dataset.lesson}`; });
+  const llogo = article.querySelector(".landing-logo img");
+  if (llogo) llogo.addEventListener("error", () => {
+    const c = article.querySelector(".landing-logo");
+    c.style.background = "var(--accent)"; c.style.color = "#fff";
+    c.innerHTML = ICONS.code.replace('width="20"', "");
   });
 
+  article.querySelectorAll(".lang-tab").forEach((t) =>
+    t.addEventListener("click", () => renderRoadmap(t.dataset.lang))
+  );
+  el("startBtn").addEventListener("click", () => { location.hash = "python/01-pengenalan"; });
+
+  renderRoadmap("python");
   el("prevBtn").hidden = true;
   el("nextBtn").hidden = true;
   setActive(null);
@@ -162,6 +193,7 @@ async function loadLesson(langId, lessonId) {
   const lesson = lang && lang.pelajaran.find((p) => p.id === lessonId);
   if (!lesson) { renderHome(); return; }
 
+  document.body.dataset.view = "app";
   article.innerHTML = `<p style="color:var(--text-muted)">Memuat…</p>`;
   try {
     const res = await fetch(`content/${langId}/${lessonId}.md`);
@@ -170,8 +202,7 @@ async function loadLesson(langId, lessonId) {
     article.innerHTML = `<div class="lesson-meta">${lang.nama}</div>` + MD.render(md);
     document.title = `${lesson.judul} — Buku Belajar Coding`;
   } catch (e) {
-    article.innerHTML =
-      `<h1>Materi belum tersedia</h1><p>Pelajaran ini sedang disiapkan. Silakan pilih pelajaran lain dari menu.</p>`;
+    article.innerHTML = `<h1>Materi belum tersedia</h1><p>Pelajaran ini sedang disiapkan. Silakan pilih pelajaran lain dari menu.</p>`;
   }
 
   setActive(`${langId}/${lessonId}`);
