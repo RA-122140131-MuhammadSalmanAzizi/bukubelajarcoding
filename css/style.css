@@ -15,6 +15,8 @@
   --accent-hover: #0f4a5e;
   --accent-soft: #e7f0f3;
   --shadow: 0 6px 24px rgba(28, 27, 25, 0.08);
+  --scroll-thumb: #cfc9ba;
+  --scroll-thumb-hover: #b4ad9c;
   --sidebar-w: 288px;
   --topbar-h: 60px;
   --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
@@ -26,13 +28,15 @@
   --bg: #14161a;
   --bg-alt: #1b1e24;
   --bg-code: #1d2128;
-  --text: #e8e6e1;
-  --text-muted: #9a978f;
+  --text: #edece8;
+  --text-muted: #a3a099;
   --border: #2b2f37;
   --accent: #5fb3d1;
   --accent-hover: #7cc3dc;
   --accent-soft: #182530;
   --shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+  --scroll-thumb: #3a3f49;
+  --scroll-thumb-hover: #4c525e;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -47,7 +51,25 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* Semua heading mewarisi warna teks (penting agar terbaca di mode gelap) */
+h1, h2, h3, h4 { color: var(--text); }
+
 svg { width: 20px; height: 20px; display: block; }
+
+/* ---------- Scrollbar custom ---------- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) transparent;
+}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); background-clip: content-box; }
 
 /* ---------- Top bar ---------- */
 .topbar {
@@ -63,10 +85,11 @@ svg { width: 20px; height: 20px; display: block; }
 
 .brand { display: flex; align-items: center; gap: 11px; text-decoration: none; color: var(--text); }
 .brand-mark {
-  display: grid; place-items: center;
+  display: grid; place-items: center; overflow: hidden;
   width: 34px; height: 34px; border-radius: 9px;
   background: var(--accent); color: #fff;
 }
+.brand-mark img { width: 100%; height: 100%; object-fit: cover; }
 .brand-mark svg { width: 19px; height: 19px; }
 .brand-text { font-family: var(--serif); font-weight: 600; font-size: 1.15rem; letter-spacing: -0.01em; }
 
@@ -96,15 +119,14 @@ svg { width: 20px; height: 20px; display: block; }
 .sidebar {
   position: fixed; top: var(--topbar-h); left: 0;
   width: var(--sidebar-w); height: calc(100vh - var(--topbar-h));
-  overflow-y: auto;
   background: var(--bg);
   border-right: 1px solid var(--border);
-  padding: 20px 14px;
+  display: flex; flex-direction: column;
 }
 
-.search-box { position: relative; margin-bottom: 18px; }
+.search-box { position: relative; flex: 0 0 auto; padding: 18px 14px 12px; }
 .search-icon {
-  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  position: absolute; left: 26px; top: 50%; transform: translateY(-30%);
   color: var(--text-muted); pointer-events: none;
 }
 .search-icon svg { width: 17px; height: 17px; }
@@ -114,6 +136,20 @@ svg { width: 20px; height: 20px; display: block; }
   background: var(--bg-alt); color: var(--text); font-size: 0.9rem; font-family: var(--sans);
 }
 .search-box input:focus { outline: none; border-color: var(--accent); background: var(--bg); }
+
+/* Area navigasi (bisa di-scroll) */
+.nav { flex: 1 1 auto; overflow-y: auto; padding: 4px 14px 14px; }
+
+/* Footer sidebar: tombol kirim masukan */
+.sidebar-footer { flex: 0 0 auto; padding: 12px 14px; border-top: 1px solid var(--border); }
+.feedback-btn {
+  width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--bg-alt); border: 1px solid var(--border); color: var(--text);
+  padding: 10px 14px; border-radius: 10px; cursor: pointer;
+  font-size: 0.88rem; font-weight: 600; font-family: var(--sans);
+}
+.feedback-btn svg { width: 17px; height: 17px; color: var(--accent); }
+.feedback-btn:hover { border-color: var(--accent); }
 
 /* ---------- Navigasi ---------- */
 .nav-group { margin-bottom: 3px; }
@@ -128,26 +164,24 @@ svg { width: 20px; height: 20px; display: block; }
 .nav-lang .chev svg { width: 16px; height: 16px; }
 .nav-lang.open .chev { transform: rotate(90deg); }
 
-/* Badge monogram bahasa (pengganti emoji) */
 .lang-badge {
   flex: 0 0 auto;
   display: grid; place-items: center;
   min-width: 30px; height: 26px; padding: 0 7px;
   border-radius: 7px;
-  font-family: var(--mono); font-size: 0.72rem; font-weight: 700;
-  letter-spacing: -0.02em;
+  font-family: var(--mono); font-size: 0.72rem; font-weight: 700; letter-spacing: -0.02em;
   background: color-mix(in srgb, var(--c) 15%, transparent);
   color: var(--c);
   border: 1px solid color-mix(in srgb, var(--c) 30%, transparent);
 }
 
+/* Daftar pelajaran per bahasa — punya scroll sendiri bila panjang */
 .nav-lessons { display: none; margin: 1px 0 6px 26px; border-left: 1px solid var(--border); padding-left: 4px; }
-.nav-lessons.open { display: block; }
+.nav-lessons.open { display: block; max-height: 300px; overflow-y: auto; }
 .nav-lesson {
   display: block; width: 100%; text-align: left;
   background: none; border: none; color: var(--text-muted);
-  font-size: 0.87rem; padding: 7px 12px; cursor: pointer; border-radius: 7px;
-  line-height: 1.4;
+  font-size: 0.87rem; padding: 7px 12px; cursor: pointer; border-radius: 7px; line-height: 1.4;
 }
 .nav-lesson:hover { color: var(--text); background: var(--bg-alt); }
 .nav-lesson.active { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
@@ -156,19 +190,34 @@ svg { width: 20px; height: 20px; display: block; }
 .content { margin-left: var(--sidebar-w); flex: 1; min-width: 0; padding: 44px 48px 72px; }
 .article { max-width: 760px; margin: 0 auto; }
 
-/* Beranda */
-.hero { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 36px; }
+/* ---------- Landing page ---------- */
+.hero { padding: 20px 0 28px; }
 .hero .eyebrow {
   font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.12em;
   text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
 }
-.hero h1 { font-family: var(--serif); font-size: 2.6rem; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 16px; }
-.hero p { color: var(--text-muted); font-size: 1.12rem; max-width: 560px; }
+.hero h1 { font-family: var(--serif); font-size: 2.7rem; line-height: 1.12; letter-spacing: -0.02em; margin-bottom: 16px; }
+.hero p { color: var(--text-muted); font-size: 1.14rem; max-width: 580px; }
 
 .section-label {
   font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.1em;
-  text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px;
+  text-transform: uppercase; color: var(--text-muted);
+  margin: 44px 0 16px; padding-top: 20px; border-top: 1px solid var(--border);
 }
+.section-label:first-of-type { border-top: none; padding-top: 0; }
+
+/* Fitur */
+.feature-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.feature {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg);
+}
+.feature .f-icon { flex: 0 0 auto; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 9px; background: var(--accent-soft); color: var(--accent); }
+.feature .f-icon svg { width: 19px; height: 19px; }
+.feature h4 { font-size: 0.96rem; margin-bottom: 3px; }
+.feature p { font-size: 0.84rem; color: var(--text-muted); line-height: 1.5; }
+
+/* Kartu bahasa */
 .lang-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
 .lang-card {
   display: flex; flex-direction: column; gap: 10px;
@@ -178,15 +227,37 @@ svg { width: 20px; height: 20px; display: block; }
 }
 .lang-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: color-mix(in srgb, var(--c) 45%, var(--border)); }
 .lang-card .lang-badge { min-width: 40px; height: 34px; font-size: 0.9rem; }
-.lang-card h3 { font-family: var(--serif); font-size: 1.3rem; font-weight: 600; }
+.lang-card h3 { font-family: var(--serif); font-size: 1.3rem; font-weight: 600; color: var(--text); }
 .lang-card p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.55; }
 .lang-card .count { margin-top: auto; color: var(--accent); font-size: 0.8rem; font-weight: 600; }
 
+/* Roadmap */
+.roadmap { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
+.roadmap-col { border: 1px solid var(--border); border-radius: 14px; padding: 18px; background: var(--bg); }
+.roadmap-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.roadmap-head h3 { font-family: var(--serif); font-size: 1.15rem; }
+.roadmap-steps { list-style: none; margin: 0; padding: 0; position: relative; }
+.roadmap-steps li {
+  position: relative; padding: 6px 0 6px 26px; font-size: 0.88rem; color: var(--text-muted);
+  cursor: pointer; line-height: 1.4;
+}
+.roadmap-steps li::before {
+  content: ""; position: absolute; left: 6px; top: 12px;
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--bg); border: 2px solid var(--c);
+}
+.roadmap-steps li::after {
+  content: ""; position: absolute; left: 10px; top: 20px; bottom: -2px;
+  width: 2px; background: color-mix(in srgb, var(--c) 30%, var(--border));
+}
+.roadmap-steps li:last-child::after { display: none; }
+.roadmap-steps li:hover { color: var(--accent); }
+
 /* ---------- Tipografi materi ---------- */
-.article h1 { font-family: var(--serif); font-size: 2.1rem; line-height: 1.2; letter-spacing: -0.015em; margin: 0 0 8px; }
+.article h1 { font-family: var(--serif); font-size: 2.1rem; line-height: 1.2; letter-spacing: -0.015em; margin: 0 0 8px; color: var(--text); }
 .article > .lesson-meta { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; }
-.article h2 { font-family: var(--serif); font-size: 1.5rem; font-weight: 600; margin: 40px 0 14px; padding-top: 6px; }
-.article h3 { font-size: 1.15rem; font-weight: 700; margin: 28px 0 10px; }
+.article h2 { font-family: var(--serif); font-size: 1.5rem; font-weight: 600; margin: 40px 0 14px; padding-top: 6px; color: var(--text); }
+.article h3 { font-size: 1.15rem; font-weight: 700; margin: 28px 0 10px; color: var(--text); }
 .article p { margin: 14px 0; }
 .article ul, .article ol { margin: 14px 0 14px 26px; }
 .article li { margin: 6px 0; }
@@ -202,7 +273,6 @@ svg { width: 20px; height: 20px; display: block; }
 }
 .article blockquote p { margin: 4px 0; }
 
-/* Inline code */
 .article code {
   background: var(--bg-code); padding: 2px 6px; border-radius: 5px;
   font-family: var(--mono); font-size: 0.86em;
@@ -210,12 +280,10 @@ svg { width: 20px; height: 20px; display: block; }
   border: 1px solid var(--border);
 }
 
-/* Code block */
 .code-block { margin: 20px 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
 .code-head {
   display: flex; align-items: center; justify-content: space-between;
-  background: var(--bg-alt); padding: 7px 12px;
-  border-bottom: 1px solid var(--border);
+  background: var(--bg-alt); padding: 7px 12px; border-bottom: 1px solid var(--border);
 }
 .code-lang { font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); font-weight: 600; }
 .copy-btn {
@@ -229,7 +297,6 @@ svg { width: 20px; height: 20px; display: block; }
 .code-block pre { margin: 0; padding: 15px 16px; overflow-x: auto; background: var(--bg-code); }
 .code-block pre code { background: none; border: none; padding: 0; color: var(--text); font-size: 0.85rem; line-height: 1.6; }
 
-/* Tabel */
 .article table { border-collapse: collapse; width: 100%; margin: 20px 0; font-size: 0.9rem; }
 .article th, .article td { border: 1px solid var(--border); padding: 9px 13px; text-align: left; }
 .article th { background: var(--bg-alt); font-weight: 600; }
@@ -249,8 +316,44 @@ svg { width: 20px; height: 20px; display: block; }
 
 .site-footer { max-width: 760px; margin: 56px auto 0; padding-top: 22px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.85rem; }
 
-/* ---------- Overlay (mobile) ---------- */
+/* ---------- Overlay ---------- */
 .overlay { position: fixed; inset: var(--topbar-h) 0 0 0; background: rgba(0, 0, 0, 0.45); z-index: 40; }
+
+/* ---------- Modal Masukan ---------- */
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(0, 0, 0, 0.5);
+  display: grid; place-items: center; padding: 20px;
+  animation: fade 0.15s ease;
+}
+.modal-backdrop[hidden] { display: none; }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+.modal {
+  width: 100%; max-width: 460px;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 16px; box-shadow: var(--shadow); overflow: hidden;
+  animation: pop 0.18s ease;
+}
+@keyframes pop { from { transform: translateY(10px) scale(0.98); opacity: 0; } to { transform: none; opacity: 1; } }
+.modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 20px 22px 6px; }
+.modal-head h2 { font-family: var(--serif); font-size: 1.35rem; }
+.modal-head p { color: var(--text-muted); font-size: 0.88rem; margin-top: 4px; }
+.modal-close { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; border-radius: 7px; }
+.modal-close:hover { background: var(--bg-alt); color: var(--text); }
+.modal-body { padding: 12px 22px 22px; }
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 6px; }
+.field input, .field textarea {
+  width: 100%; padding: 10px 12px; font-family: var(--sans); font-size: 0.9rem;
+  border: 1px solid var(--border); border-radius: 10px; background: var(--bg-alt); color: var(--text); resize: vertical;
+}
+.field input:focus, .field textarea:focus { outline: none; border-color: var(--accent); background: var(--bg); }
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px; }
+.btn-ghost { background: none; border: 1px solid var(--border); color: var(--text); padding: 9px 16px; border-radius: 10px; cursor: pointer; font-weight: 600; font-family: var(--sans); font-size: 0.88rem; }
+.btn-ghost:hover { background: var(--bg-alt); }
+.btn-primary { background: var(--accent); color: #fff; border: none; padding: 9px 18px; border-radius: 10px; cursor: pointer; font-weight: 600; font-family: var(--sans); font-size: 0.88rem; }
+.btn-primary:hover { background: var(--accent-hover); }
+.modal-note { font-size: 0.78rem; color: var(--text-muted); margin-top: 12px; }
 
 /* ---------- Responsif ---------- */
 @media (max-width: 860px) {
@@ -258,7 +361,7 @@ svg { width: 20px; height: 20px; display: block; }
   .content { margin-left: 0; padding: 28px 20px 56px; }
   .sidebar { transform: translateX(-100%); transition: transform 0.25s ease; z-index: 45; box-shadow: var(--shadow); }
   .sidebar.open { transform: translateX(0); }
-  .hero h1 { font-size: 2rem; }
+  .hero h1 { font-size: 2.1rem; }
   .article h1 { font-size: 1.7rem; }
   .brand-text { font-size: 1.05rem; }
   .pill-btn span { display: none; }
