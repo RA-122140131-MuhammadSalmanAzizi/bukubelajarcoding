@@ -1,0 +1,26 @@
+{
+  "name": "Buku Belajar Coding",
+  "short_name": "Belajar Coding",
+  "description": "Belajar Python, JavaScript, C++, PHP, dan Go dalam Bahasa Indonesia. Responsif & bisa dipakai offline.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#fbfaf7",
+  "theme_color": "#15607a",
+  "lang": "id",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

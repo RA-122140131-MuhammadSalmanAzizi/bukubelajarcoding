@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Buku Belajar Coding — belajar Python, JavaScript, C++, PHP, dan Go dalam Bahasa Indonesia. Web app responsif & bisa dipakai offline (PWA)." />
+  <meta name="theme-color" content="#15607a" />
+  <title>Buku Belajar Coding</title>
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
+  <link rel="apple-touch-icon" href="icons/icon.svg" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- Top bar -->
+  <header class="topbar">
+    <button id="menuBtn" class="icon-btn" aria-label="Buka menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+    </button>
+
+    <a href="#" class="brand" id="brandHome" aria-label="Beranda">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      </span>
+      <span class="brand-text">Buku Belajar Coding</span>
+    </a>
+
+    <div class="topbar-actions">
+      <button id="installBtn" class="pill-btn" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+        <span>Install</span>
+      </button>
+      <button id="themeBtn" class="icon-btn" aria-label="Ganti tema"><!-- ikon diisi app.js --></button>
+    </div>
+  </header>
+
+  <div id="overlay" class="overlay" hidden></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar">
+      <div class="search-box">
+        <span class="search-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </span>
+        <input id="searchInput" type="search" placeholder="Cari pelajaran..." aria-label="Cari" />
+      </div>
+      <nav id="nav" class="nav"><!-- diisi oleh app.js --></nav>
+    </aside>
+
+    <main class="content">
+      <article id="article" class="article"><!-- diisi oleh app.js --></article>
+
+      <nav class="pager">
+        <button id="prevBtn" class="pager-btn" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          <span>Sebelumnya</span>
+        </button>
+        <button id="nextBtn" class="pager-btn" hidden>
+          <span>Selanjutnya</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </nav>
+
+      <footer class="site-footer">
+        <p>Ditulis oleh <strong>Muhammad Salman Azizi</strong></p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="js/content-index.js"></script>
+  <script src="js/markdown.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
