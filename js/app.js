@@ -156,29 +156,53 @@ function renderHome() {
       `<span class="lang-badge" style="--c:${l.color}">${l.mark}</span>${l.nama}</button>`
   ).join("");
 
+  const totalPelajaran = BOOK.reduce((s, l) => s + l.pelajaran.length, 0);
+
+  const editor =
+    `<div class="win"><div class="win-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="win-title">halo.py</span></div>` +
+    `<pre class="win-code"><span class="com"># Program pertamamu</span>\n` +
+    `<span class="kw">def</span> <span class="fn">sapa</span>(nama):\n` +
+    `    <span class="kw">return</span> <span class="str">f"Halo, {nama}!"</span>\n\n` +
+    `<span class="fn">print</span>(sapa(<span class="str">"Salman"</span>))  <span class="com"># Halo, Salman!</span></pre></div>`;
+
   article.innerHTML =
     `<section class="landing-hero">` +
+    `<span class="hero-badge"><span class="dot-live"></span>100% Gratis &middot; Bahasa Indonesia</span>` +
     `<div class="landing-logo"><img src="aset/logo.png" alt="Logo Buku Belajar Coding" /></div>` +
     `<h1>Buku Belajar Coding</h1>` +
-    `<p class="tagline">Belajar Python, JavaScript, C++, dan lainnya dalam Bahasa Indonesia — ringkas, langsung ke inti, dari nol.</p>` +
-    `<div class="landing-cta"><button class="btn-primary lg" id="startBtn">Mulai Belajar</button></div>` +
+    `<p class="tagline">Kuasai Python, JavaScript, C++, dan lainnya lewat materi ringkas berbahasa Indonesia. <span class="free">Akses gratis</span>, bisa dibuka offline, kapan saja.</p>` +
+    `<div class="landing-cta"><button class="btn-primary lg" id="startBtn">Mulai Belajar</button>` +
+    `<button class="btn-ghost lg" id="browseBtn">Lihat Materi</button></div>` +
+    `<div class="hero-stats">` +
+    `<div class="hero-stat"><div class="num">${BOOK.length}</div><div class="lbl">Bahasa</div></div>` +
+    `<div class="hero-stat"><div class="num">${totalPelajaran}</div><div class="lbl">Pelajaran</div></div>` +
+    `<div class="hero-stat"><div class="num">Gratis</div><div class="lbl">Selamanya</div></div></div>` +
+    `<div class="hero-visual">${editor}</div>` +
     `</section>` +
     `<div class="section-label">Kenapa Buku Ini</div>` +
     `<div class="feature-row">${fitur}</div>` +
     `<div class="section-label">Pilih Bahasa &amp; Roadmap</div>` +
-    `<div class="roadmap-wrap"><div class="lang-tabs">${tabs}</div><div id="roadmapArea"></div></div>`;
+    `<div class="roadmap-wrap"><div class="lang-tabs">${tabs}</div><div id="roadmapArea"></div></div>` +
+    `<div class="closing-cta"><h2>Siap mulai perjalananmu?</h2>` +
+    `<p>Pilih bahasa favoritmu dan mulai dari pelajaran pertama. Tanpa biaya, tanpa perlu daftar.</p>` +
+    `<button class="btn-primary lg" id="startBtn2">Mulai Belajar Sekarang</button></div>`;
 
   const llogo = article.querySelector(".landing-logo img");
   if (llogo) llogo.addEventListener("error", () => {
     const c = article.querySelector(".landing-logo");
     c.style.background = "var(--accent)"; c.style.color = "#fff";
-    c.innerHTML = ICONS.code.replace('width="20"', "");
+    c.innerHTML = ICONS.code;
   });
 
   article.querySelectorAll(".lang-tab").forEach((t) =>
     t.addEventListener("click", () => renderRoadmap(t.dataset.lang))
   );
-  el("startBtn").addEventListener("click", () => { location.hash = "python/01-pengenalan"; });
+  const goStart = () => { location.hash = "python/01-pengenalan"; };
+  el("startBtn").addEventListener("click", goStart);
+  el("startBtn2").addEventListener("click", goStart);
+  el("browseBtn").addEventListener("click", () => {
+    article.querySelector(".roadmap-wrap").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 
   renderRoadmap("python");
   el("prevBtn").hidden = true;
