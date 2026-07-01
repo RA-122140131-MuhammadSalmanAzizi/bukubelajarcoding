@@ -158,17 +158,34 @@ function renderHome() {
 
   const totalPelajaran = BOOK.reduce((s, l) => s + l.pelajaran.length, 0);
 
-  const editor =
-    `<div class="win"><div class="win-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="win-title">halo.py</span></div>` +
-    `<pre class="win-code"><span class="com"># Program pertamamu</span>\n` +
-    `<span class="kw">def</span> <span class="fn">sapa</span>(nama):\n` +
-    `    <span class="kw">return</span> <span class="str">f"Halo, {nama}!"</span>\n\n` +
-    `<span class="fn">print</span>(sapa(<span class="str">"Salman"</span>))  <span class="com"># Halo, Salman!</span></pre></div>`;
+  const heroArt =
+    `<svg viewBox="0 0 460 400" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ilustrasi belajar coding">` +
+    `<rect x="34" y="52" width="392" height="290" rx="46" fill="var(--accent-soft)"/>` +
+    // chip kode melayang
+    `<g transform="translate(322 66)"><rect width="74" height="56" rx="15" fill="var(--surface)" stroke="var(--border)" stroke-width="2"/>` +
+    `<path d="M28 21 L19 28 L28 35 M46 21 L55 28 L46 35 M39 17 L35 39" stroke="var(--accent)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></g>` +
+    // titik-titik dekor
+    `<circle cx="80" cy="104" r="6" fill="var(--accent)" opacity="0.45"/>` +
+    `<circle cx="372" cy="292" r="9" fill="var(--accent)" opacity="0.3"/>` +
+    `<circle cx="66" cy="300" r="5" fill="var(--accent)" opacity="0.35"/>` +
+    // cangkir kopi
+    `<g transform="translate(300 250)"><rect x="0" y="14" width="54" height="48" rx="11" fill="var(--surface)" stroke="var(--accent)" stroke-width="3.2"/>` +
+    `<path d="M54 24 h9 a11 11 0 0 1 0 22 h-9" fill="none" stroke="var(--accent)" stroke-width="3.2"/>` +
+    `<path d="M16 4 c0 -7 8 -7 8 -14 M32 4 c0 -7 8 -7 8 -14" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" opacity="0.45"/></g>` +
+    // buku terbuka
+    `<g transform="translate(96 150)">` +
+    `<path d="M8 104 L120 76 L232 104 L232 126 L120 98 L8 126 Z" fill="var(--accent)"/>` +
+    `<path d="M120 78 L226 104 L226 44 C190 32 150 36 120 50 Z" fill="var(--surface)" stroke="var(--border)" stroke-width="2"/>` +
+    `<path d="M120 78 L14 104 L14 44 C50 32 90 36 120 50 Z" fill="var(--surface)" stroke="var(--border)" stroke-width="2"/>` +
+    `<g stroke="var(--accent)" stroke-width="3.2" stroke-linecap="round" opacity="0.4">` +
+    `<line x1="30" y1="60" x2="104" y2="52"/><line x1="30" y1="74" x2="104" y2="66"/><line x1="30" y1="88" x2="86" y2="82"/>` +
+    `<line x1="136" y1="52" x2="210" y2="60"/><line x1="136" y1="66" x2="210" y2="74"/><line x1="136" y1="82" x2="192" y2="88"/></g>` +
+    `<path d="M158 34 L176 38 L176 88 L167 79 L158 88 Z" fill="var(--accent)"/></g>` +
+    `</svg>`;
 
   article.innerHTML =
     `<section class="landing-hero">` +
-    `<span class="hero-badge"><span class="dot-live"></span>100% Gratis &middot; Bahasa Indonesia</span>` +
-    `<div class="landing-logo"><img src="aset/logo.png" alt="Logo Buku Belajar Coding" /></div>` +
+    `<div class="hero-text">` +
     `<h1>Buku Belajar Coding</h1>` +
     `<p class="tagline">Kuasai Python, JavaScript, C++, dan lainnya lewat materi ringkas berbahasa Indonesia. <span class="free">Akses gratis</span>, bisa dibuka offline, kapan saja.</p>` +
     `<div class="landing-cta"><button class="btn-primary lg" id="startBtn">Mulai Belajar</button>` +
@@ -177,7 +194,8 @@ function renderHome() {
     `<div class="hero-stat"><div class="num">${BOOK.length}</div><div class="lbl">Bahasa</div></div>` +
     `<div class="hero-stat"><div class="num">${totalPelajaran}</div><div class="lbl">Pelajaran</div></div>` +
     `<div class="hero-stat"><div class="num">Gratis</div><div class="lbl">Selamanya</div></div></div>` +
-    `<div class="hero-visual">${editor}</div>` +
+    `</div>` +
+    `<div class="hero-art">${heroArt}</div>` +
     `</section>` +
     `<div class="section-label">Kenapa Buku Ini</div>` +
     `<div class="feature-row">${fitur}</div>` +
@@ -187,12 +205,13 @@ function renderHome() {
     `<p>Pilih bahasa favoritmu dan mulai dari pelajaran pertama. Tanpa biaya, tanpa perlu daftar.</p>` +
     `<button class="btn-primary lg" id="startBtn2">Mulai Belajar Sekarang</button></div>`;
 
-  const llogo = article.querySelector(".landing-logo img");
-  if (llogo) llogo.addEventListener("error", () => {
-    const c = article.querySelector(".landing-logo");
-    c.style.background = "var(--accent)"; c.style.color = "#fff";
-    c.innerHTML = ICONS.code;
-  });
+  // Kalau ada gambar kustom aset/hero.png, pakai itu; kalau tidak, ilustrasi bawaan
+  const probe = new Image();
+  probe.onload = () => {
+    const art = article.querySelector(".hero-art");
+    if (art) art.innerHTML = `<img src="aset/hero.png" alt="Ilustrasi belajar coding" />`;
+  };
+  probe.src = "aset/hero.png";
 
   article.querySelectorAll(".lang-tab").forEach((t) =>
     t.addEventListener("click", () => renderRoadmap(t.dataset.lang))

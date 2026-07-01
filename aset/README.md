@@ -1,8 +1,12 @@
 # Folder Aset
 
-Taruh logo aplikasi di sini dengan nama **`logo.png`**.
+## logo.png (wajib)
+Logo aplikasi. Dipakai untuk brand di pojok kiri atas, favicon, dan ikon homescreen.
+- Disarankan gambar **persegi** (misal 512 x 512 piksel), format PNG.
+- Jika belum ada, aplikasi menampilkan ikon cadangan `</>`.
 
-- Disarankan gambar **persegi** (misal 512 x 512 piksel).
-- Format PNG (boleh dengan latar transparan).
-
-Selama `logo.png` belum ada, aplikasi otomatis menampilkan ikon cadangan berupa simbol `</>`.
+## hero.png (opsional)
+Gambar/ilustrasi besar di halaman depan (misal orang sedang membaca/belajar).
+- Jika file ini ada, otomatis menggantikan ilustrasi bawaan di hero.
+- Jika tidak ada, aplikasi memakai ilustrasi SVG bawaan (buku terbuka + elemen belajar).
+- Disarankan gambar dengan latar transparan (PNG), sisi kurang-lebih persegi.
