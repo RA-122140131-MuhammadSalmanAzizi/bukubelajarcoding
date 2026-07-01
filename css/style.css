@@ -221,7 +221,12 @@ svg { width: 20px; height: 20px; display: block; }
 .pconn svg { width: 100%; height: 100%; display: block; }
 
 /* ---------- Tipografi materi ---------- */
-.article .lesson-meta { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; }
+.lesson-head { margin-bottom: 4px; }
+.article .lesson-meta { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+.lesson-title { font-family: var(--serif); font-size: 2.1rem; line-height: 1.2; letter-spacing: -0.015em; margin: 0; color: var(--text); }
+.pager.pager-top { max-width: none; margin: 16px 0 30px; padding-bottom: 22px; border-bottom: 1px solid var(--border); }
+.lesson-body > :first-child { margin-top: 0; }
+.lesson-body > h2:first-child { padding-top: 0; }
 .article h1 { font-family: var(--serif); font-size: 2.1rem; line-height: 1.2; letter-spacing: -0.015em; margin: 0 0 8px; }
 .article h2 { font-family: var(--serif); font-size: 1.5rem; font-weight: 600; margin: 40px 0 14px; padding-top: 6px; }
 .article h3 { font-size: 1.15rem; font-weight: 700; margin: 28px 0 10px; }

@@ -12,7 +12,18 @@ const ICONS = {
   check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
   code: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
   copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',
+  pagerPrev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>',
+  pagerNext: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
 };
+
+// Markup pager (dipakai di atas artikel; yang bawah statis di HTML)
+function pagerHTML(sfx) {
+  return `<nav class="pager pager-top">` +
+    `<button id="prevBtn${sfx}" class="pager-btn" hidden>${ICONS.pagerPrev}<span>Sebelumnya</span></button>` +
+    `<span id="pageInd${sfx}" class="page-ind" hidden></span>` +
+    `<button id="nextBtn${sfx}" class="pager-btn" hidden><span>Selanjutnya</span>${ICONS.pagerNext}</button>` +
+    `</nav>`;
+}
 
 const FEATURES = [
   { t: "Responsif", d: "Nyaman dibaca di ponsel maupun desktop.", i: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="2" y="2" rx="2"/><path d="M14 2v20"/><path d="M18 8h4v10a2 2 0 0 1-2 2h-2"/></svg>' },
@@ -270,7 +281,12 @@ async function loadLesson(langId, lessonId, page) {
 
   if (LESSON.pages.length) {
     const meta = total > 1 ? `${lang.nama} &middot; Halaman ${cur} dari ${total}` : lang.nama;
-    article.innerHTML = `<div class="lesson-meta">${meta}</div>` + MD.render(LESSON.pages[cur - 1]);
+    const judul = lesson.judul.replace(/^\d+\.\s*/, "");
+    const pageMd = LESSON.pages[cur - 1].replace(/^#\s+.*\n?/, ""); // buang H1 (diganti judul tetap di atas)
+    article.innerHTML =
+      `<div class="lesson-head"><div class="lesson-meta">${meta}</div><h1 class="lesson-title">${judul}</h1></div>` +
+      pagerHTML("Top") +
+      `<div class="lesson-body">${MD.render(pageMd)}</div>`;
   } else {
     article.innerHTML = `<h1>Materi belum tersedia</h1><p>Pelajaran ini sedang disiapkan. Silakan pilih pelajaran lain dari menu.</p>`;
   }
@@ -295,25 +311,25 @@ function setActive(key) {
 
 function buildPager(langId, lessonId, cur, total) {
   const idx = FLAT.findIndex((f) => f.langId === langId && f.lessonId === lessonId);
-  const prevBtn = el("prevBtn");
-  const nextBtn = el("nextBtn");
-  const ind = el("pageInd");
 
   // Sebelumnya: halaman sebelumnya di bab ini, atau bab sebelumnya
   let prevHash = null;
   if (cur > 1) prevHash = `${langId}/${lessonId}/${cur - 1}`;
   else if (FLAT[idx - 1]) prevHash = `${FLAT[idx - 1].langId}/${FLAT[idx - 1].lessonId}`;
-  prevBtn.hidden = !prevHash;
-  if (prevHash) prevBtn.onclick = () => { location.hash = prevHash; };
-
   // Selanjutnya: halaman berikutnya di bab ini, atau bab berikutnya
   let nextHash = null;
   if (cur < total) nextHash = `${langId}/${lessonId}/${cur + 1}`;
   else if (FLAT[idx + 1]) nextHash = `${FLAT[idx + 1].langId}/${FLAT[idx + 1].lessonId}`;
-  nextBtn.hidden = !nextHash;
-  if (nextHash) nextBtn.onclick = () => { location.hash = nextHash; };
 
-  if (ind) { ind.textContent = total > 1 ? `${cur} / ${total}` : ""; ind.hidden = total <= 1; }
+  // Terapkan ke pager atas ("Top") dan bawah ("")
+  const apply = (sfx) => {
+    const P = el("prevBtn" + sfx), N = el("nextBtn" + sfx), I = el("pageInd" + sfx);
+    if (P) { P.hidden = !prevHash; if (prevHash) P.onclick = () => { location.hash = prevHash; }; }
+    if (N) { N.hidden = !nextHash; if (nextHash) N.onclick = () => { location.hash = nextHash; }; }
+    if (I) { I.textContent = total > 1 ? `${cur} / ${total}` : ""; I.hidden = total <= 1; }
+  };
+  apply("");
+  apply("Top");
 }
 
 /* ---------- Tombol salin kode ---------- */
