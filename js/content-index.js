@@ -10,6 +10,7 @@ const BOOK = [
     nama: "Python",
     mark: "Py",
     color: "#3776ab",
+    logo: "aset/logos/python.svg",
     deskripsi: "Bahasa serbaguna & mudah dibaca. Favorit untuk AI, data science, dan web backend.",
     pelajaran: [
       { id: "01-pengenalan", judul: "1. Pengenalan Python" },
@@ -36,6 +37,7 @@ const BOOK = [
     nama: "JavaScript",
     mark: "JS",
     color: "#c99a06",
+    logo: "aset/logos/javascript.svg",
     deskripsi: "Bahasa web. Jalan di browser dan server (Node.js). Wajib untuk front-end.",
     pelajaran: [
       { id: "01-pengenalan", judul: "1. Pengenalan JavaScript" },
@@ -50,6 +52,7 @@ const BOOK = [
     nama: "C++",
     mark: "C++",
     color: "#8a4fa3",
+    logo: "aset/logos/cpp.svg",
     deskripsi: "Bahasa cepat & dekat dengan mesin. Untuk game, sistem, dan kompetisi programming.",
     pelajaran: [
       { id: "01-pengenalan", judul: "1. Pengenalan C++" },
@@ -64,6 +67,7 @@ const BOOK = [
     nama: "PHP",
     mark: "php",
     color: "#6a7bb0",
+    logo: "aset/logos/php.svg",
     deskripsi: "Bahasa web server klasik. Menggerakkan banyak situs (WordPress, Laravel).",
     pelajaran: [
       { id: "01-pengenalan", judul: "1. Pengenalan PHP" },
@@ -75,6 +79,7 @@ const BOOK = [
     nama: "Go",
     mark: "Go",
     color: "#2a9fb8",
+    logo: "aset/logos/go.svg",
     deskripsi: "Bahasa modern dari Google. Cepat, sederhana, andal untuk server & cloud.",
     pelajaran: [
       { id: "01-pengenalan", judul: "1. Pengenalan Go" },

@@ -2,7 +2,7 @@
    Service Worker — bikin app bisa dibuka offline (PWA)
    ============================================================ */
 
-const CACHE = "bbc-v5";
+const CACHE = "bbc-v7";
 
 // Berkas inti yang dipracache saat install
 const CORE = [
@@ -14,6 +14,11 @@ const CORE = [
   "./js/content-index.js",
   "./manifest.json",
   "./aset/logo.png",
+  "./aset/logos/python.svg",
+  "./aset/logos/javascript.svg",
+  "./aset/logos/cpp.svg",
+  "./aset/logos/php.svg",
+  "./aset/logos/go.svg",
 ];
 
 self.addEventListener("install", (e) => {

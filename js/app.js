@@ -32,6 +32,13 @@ const el = (id) => document.getElementById(id);
 const nav = el("nav");
 const article = el("article");
 
+/* Badge bahasa: pakai logo asli jika ada, kalau tidak pakai monogram */
+function badgeHTML(lang) {
+  return lang.logo
+    ? `<img class="lang-logo" src="${lang.logo}" alt="${lang.nama}" />`
+    : `<span class="lang-badge" style="--c:${lang.color}">${lang.mark}</span>`;
+}
+
 /* ---------- Logo topbar: fallback ke ikon jika gambar tak ada ---------- */
 const brandLogo = el("brandLogo");
 if (brandLogo) {
@@ -74,7 +81,7 @@ function buildNav() {
     const btn = document.createElement("button");
     btn.className = "nav-lang";
     btn.innerHTML =
-      `<span class="lang-badge" style="--c:${lang.color}">${lang.mark}</span>` +
+      badgeHTML(lang) +
       `<span>${lang.nama}</span><span class="chev">${ICONS.chevron}</span>`;
 
     const list = document.createElement("div");
@@ -153,7 +160,7 @@ function renderHome() {
   const tabs = BOOK.map(
     (l) =>
       `<button class="lang-tab" style="--c:${l.color}" data-lang="${l.id}">` +
-      `<span class="lang-badge" style="--c:${l.color}">${l.mark}</span>${l.nama}</button>`
+      `${badgeHTML(l)}${l.nama}</button>`
   ).join("");
 
   const totalPelajaran = BOOK.reduce((s, l) => s + l.pelajaran.length, 0);
@@ -193,9 +200,9 @@ function renderHome() {
     `<div class="hero-stats">` +
     `<div class="hero-stat"><div class="num">${BOOK.length}</div><div class="lbl">Bahasa</div></div>` +
     `<div class="hero-stat"><div class="num">${totalPelajaran}</div><div class="lbl">Pelajaran</div></div>` +
-    `<div class="hero-stat"><div class="num">Gratis</div><div class="lbl">Selamanya</div></div></div>` +
+    `<div class="hero-stat"><div class="num">24/7</div><div class="lbl">Akses Kapan Saja</div></div></div>` +
     `</div>` +
-    `<div class="hero-art">${heroArt}</div>` +
+    `<div class="hero-art"><img id="heroImg" src="aset/hero.png" alt="Ilustrasi belajar coding" /></div>` +
     `</section>` +
     `<div class="section-label">Kenapa Buku Ini</div>` +
     `<div class="feature-row">${fitur}</div>` +
@@ -205,13 +212,12 @@ function renderHome() {
     `<p>Pilih bahasa favoritmu dan mulai dari pelajaran pertama. Tanpa biaya, tanpa perlu daftar.</p>` +
     `<button class="btn-primary lg" id="startBtn2">Mulai Belajar Sekarang</button></div>`;
 
-  // Kalau ada gambar kustom aset/hero.png, pakai itu; kalau tidak, ilustrasi bawaan
-  const probe = new Image();
-  probe.onload = () => {
+  // Jika gambar hero gagal dimuat, tampilkan ilustrasi SVG bawaan sebagai cadangan
+  const heroImg = document.getElementById("heroImg");
+  if (heroImg) heroImg.addEventListener("error", () => {
     const art = article.querySelector(".hero-art");
-    if (art) art.innerHTML = `<img src="aset/hero.png" alt="Ilustrasi belajar coding" />`;
-  };
-  probe.src = "aset/hero.png";
+    if (art) art.innerHTML = heroArt;
+  });
 
   article.querySelectorAll(".lang-tab").forEach((t) =>
     t.addEventListener("click", () => renderRoadmap(t.dataset.lang))
