@@ -51,6 +51,11 @@ const BOOK = [
       { id: "09-destructuring", judul: "9. Destructuring, Spread & Rest" },
       { id: "10-modules", judul: "10. ES Modules (import/export)" },
       { id: "11-async", judul: "11. Async: Promise & await" },
+      { id: "12-error-handling", judul: "12. Error Handling (try/catch)" },
+      { id: "13-closure-hof", judul: "13. Closure & Higher-Order Function" },
+      { id: "14-this-class", judul: "14. this & Class" },
+      { id: "15-dom-events", judul: "15. DOM & Events" },
+      { id: "16-modern-react", judul: "16. JavaScript Modern untuk React" },
     ],
   },
   {
