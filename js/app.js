@@ -68,7 +68,10 @@ el("themeBtn").addEventListener("click", () => {
 /* ---------- Sidebar mobile ---------- */
 function openSidebar() { el("sidebar").classList.add("open"); el("overlay").hidden = false; }
 function closeSidebar() { el("sidebar").classList.remove("open"); el("overlay").hidden = true; }
-el("menuBtn").addEventListener("click", openSidebar);
+el("menuBtn").addEventListener("click", () => {
+  if (el("sidebar").classList.contains("open")) closeSidebar();
+  else openSidebar();
+});
 el("overlay").addEventListener("click", closeSidebar);
 
 /* ---------- Bangun navigasi sidebar ---------- */
@@ -481,11 +484,19 @@ window.addEventListener("hashchange", route);
 el("brandHome").addEventListener("click", (e) => { e.preventDefault(); location.hash = ""; renderHome(); });
 
 /* ---------- PWA ---------- */
+const isStandalone = () =>
+  window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+
 let deferredPrompt = null;
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
+  if (isStandalone()) return;          // sudah dibuka sebagai PWA, tak perlu tombol
   deferredPrompt = e;
   el("installBtn").hidden = false;
+});
+window.addEventListener("appinstalled", () => {   // sembunyikan setelah dipasang
+  deferredPrompt = null;
+  el("installBtn").hidden = true;
 });
 el("installBtn").addEventListener("click", async () => {
   if (!deferredPrompt) return;
