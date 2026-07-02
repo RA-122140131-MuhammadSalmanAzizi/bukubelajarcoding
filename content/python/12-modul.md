@@ -1,6 +1,6 @@
 # Modul & Package
 
-Modul adalah cara memakai kode dari file lain — baik dari pustaka bawaan Python maupun buatan sendiri.
+Modul adalah cara memakai kode dari file lain — baik dari pustaka bawaan Python maupun buatan sendiri. Ini membuat kode terorganisir dan bisa dipakai ulang.
 
 ## import
 
@@ -15,20 +15,24 @@ from math import sqrt, pi   # meminjam bagian tertentu saja
 sqrt(16)
 ```
 
+> Hindari `from math import *` (meminjam semuanya). Itu membuat sulit melacak dari mana sebuah fungsi berasal.
+
+<!--page-->
+
 ## Modul Bawaan yang Berguna
 
-Python menyertakan banyak modul siap pakai:
+Python menyertakan banyak modul siap pakai tanpa perlu memasang apa pun.
 
 ```python
 import random
 random.randint(1, 6)          # angka acak 1-6
-random.choice(["a", "b"])     # pilih satu acak
+random.choice(["a", "b"])     # memilih satu acak
 
 import datetime
 datetime.date.today()         # tanggal hari ini
 
 import os
-os.listdir(".")               # daftar isi folder
+os.listdir(".")               # daftar isi folder saat ini
 ```
 
 | Modul | Kegunaan |
@@ -40,6 +44,9 @@ os.listdir(".")               # daftar isi folder
 | `json` | membaca/menulis data JSON |
 | `re` | mencari pola dalam teks (regex) |
 | `collections` | struktur data tambahan (Counter, dll) |
+| `pathlib` | mengelola path file secara modern |
+
+<!--page-->
 
 ## Modul Buatan Sendiri
 
@@ -49,6 +56,8 @@ Setiap file `.py` bisa dijadikan modul dan diimpor dari file lain.
 # file: utils.py
 def sapa(nama):
     return f"Halo {nama}"
+
+PAJAK = 0.1
 ```
 
 ```python
@@ -56,32 +65,36 @@ def sapa(nama):
 import utils
 print(utils.sapa("Salman"))
 
-from utils import sapa
+from utils import sapa, PAJAK
 print(sapa("Budi"))
 ```
 
+Ini memungkinkan kamu memecah program besar menjadi beberapa file yang rapi.
+
+<!--page-->
+
 ## Blok if __name__ == "__main__"
 
-Kode yang hanya dijalankan bila file dijalankan langsung, bukan saat diimpor:
+Kode yang hanya dijalankan bila file dijalankan langsung, bukan saat diimpor.
 
 ```python
 def tambah(a, b):
     return a + b
 
 if __name__ == "__main__":
-    # hanya jalan bila: python file.py
-    # tidak jalan bila file ini diimpor file lain
+    # bagian ini hanya jalan bila: python file.py
+    # TIDAK jalan bila file ini diimpor oleh file lain
     print(tambah(2, 3))
 ```
 
-Ini kebiasaan penting agar fungsi bisa dipakai ulang tanpa efek samping.
+Ini kebiasaan penting agar fungsi bisa dipakai ulang dari file lain tanpa efek samping menjalankan seluruh program.
 
 ## Package
 
 Package adalah folder berisi banyak modul. Kehadiran file `__init__.py` menandai folder sebagai package.
 
 ```text
-project/
+proyek/
 ├── main.py
 └── models/
     ├── __init__.py
@@ -97,4 +110,6 @@ from models.user import User
 - `import modul` untuk memakai kode lain; bisa dengan alias atau impor sebagian.
 - Python punya banyak modul bawaan (`math`, `random`, `os`, `json`, dll).
 - Setiap file `.py` bisa jadi modul; folder berisi modul adalah package.
-- `if __name__ == "__main__"` memisahkan kode "jalankan" dari kode yang bisa diimpor.
+- `if __name__ == "__main__"` memisahkan kode "dijalankan langsung" dari kode yang bisa diimpor.
+
+> Latihan: buat file `kalkulator.py` berisi fungsi `tambah`, `kurang`, `kali`, `bagi`, lalu impor dan pakai fungsi-fungsi itu dari file `main.py`.
