@@ -486,11 +486,12 @@ el("brandHome").addEventListener("click", (e) => { e.preventDefault(); location.
 /* ---------- PWA ---------- */
 const isStandalone = () =>
   window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
 
 let deferredPrompt = null;
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
-  if (isStandalone()) return;          // sudah dibuka sebagai PWA, tak perlu tombol
+  if (isStandalone()) return;          // sudah dibuka sebagai PWA
   deferredPrompt = e;
   el("installBtn").hidden = false;
 });
@@ -498,12 +499,33 @@ window.addEventListener("appinstalled", () => {   // sembunyikan setelah dipasan
   deferredPrompt = null;
   el("installBtn").hidden = true;
 });
+
+// iOS Safari tak punya prompt otomatis: tampilkan tombol untuk instruksi manual
+function initInstall() {
+  if (!isStandalone() && isIOS()) el("installBtn").hidden = false;
+}
+
 el("installBtn").addEventListener("click", async () => {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  await deferredPrompt.userChoice;
-  deferredPrompt = null;
-  el("installBtn").hidden = true;
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    el("installBtn").hidden = true;
+    return;
+  }
+  if (isIOS()) {
+    alert(
+      "Cara memasang di iPhone/iPad:\n\n" +
+      "1. Tekan tombol Bagikan (kotak dengan panah ke atas) di bawah Safari.\n" +
+      "2. Gulir dan pilih \"Tambahkan ke Layar Utama\".\n" +
+      "3. Tekan \"Tambah\"."
+    );
+    return;
+  }
+  alert(
+    "Aplikasi belum bisa dipasang otomatis di browser ini.\n\n" +
+    "Pastikan situs dibuka lewat alamat HTTPS (bukan localhost), lalu cek menu browser untuk opsi \"Install\" / \"Tambahkan ke Layar Utama\"."
+  );
 });
 
 if ("serviceWorker" in navigator) {
@@ -516,3 +538,4 @@ if ("serviceWorker" in navigator) {
 initTheme();
 buildNav();
 route();
+initInstall();
