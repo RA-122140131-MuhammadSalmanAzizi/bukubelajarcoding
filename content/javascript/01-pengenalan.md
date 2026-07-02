@@ -1,11 +1,24 @@
 # Pengenalan JavaScript
 
-JavaScript adalah bahasa pemrograman utama untuk **web**. Awalnya hanya jalan di dalam browser untuk membuat halaman menjadi interaktif, kini juga jalan di server lewat **Node.js**. Jika kamu ingin menjadi web developer, JavaScript hampir tidak bisa dihindari.
+JavaScript (sering disingkat JS) adalah bahasa pemrograman utama untuk **web**. Awalnya hanya berjalan di dalam browser untuk membuat halaman menjadi interaktif, kini juga berjalan di server lewat **Node.js**. Semua framework front-end modern — termasuk **React** — dibangun di atas JavaScript.
+
+## Kenapa JavaScript Penting untuk React?
+
+React bukan bahasa baru; React adalah **library JavaScript**. Semua yang kamu tulis di React sebenarnya JavaScript:
+
+- Komponen React adalah **fungsi JavaScript** yang mengembalikan tampilan.
+- Menampilkan daftar memakai **method array** (`map`).
+- Mengambil data dari server memakai **async/await** dan `fetch`.
+- Mengirim data antar komponen memakai **object** dan **destructuring**.
+
+Artinya: semakin kuat JavaScript-mu, semakin mudah React terasa. Itulah kenapa materi ini fokus ke JavaScript modern (ES6+) yang dipakai di React.
+
+<!--page-->
 
 ## Di Mana JavaScript Berjalan?
 
-- **Di browser** — mengatur tombol, animasi, form, dan segala interaksi halaman.
-- **Di server (Node.js)** — membangun backend, API, dan aplikasi command line.
+- **Di browser** — mengatur tombol, form, animasi, dan seluruh interaksi halaman.
+- **Di server (Node.js)** — membangun backend, API, dan menjalankan alat seperti Vite (yang dipakai proyek React).
 
 ## Program Pertama
 
@@ -15,31 +28,29 @@ JavaScript adalah bahasa pemrograman utama untuk **web**. Awalnya hanya jalan di
 console.log("Halo, Dunia!");
 ```
 
-## Menjalankan JavaScript
+Cara paling cepat mencobanya: buka browser, tekan **F12** untuk membuka Developer Tools, pilih tab **Console**, ketik kode di sana, lalu Enter.
 
-Cara paling cepat: buka browser, tekan F12 untuk membuka **Developer Tools**, lalu pilih tab **Console**. Ketik kode di sana dan tekan Enter.
+> Dipakai di React: `console.log()` adalah alat debugging paling sering dipakai untuk mengecek isi variabel atau props saat aplikasi berjalan.
 
-Menyelipkan JavaScript ke halaman HTML:
+<!--page-->
+
+## Menaruh JavaScript di Halaman
+
+Dalam HTML biasa, JavaScript ditaruh di tag `<script>`:
 
 ```html
 <!DOCTYPE html>
 <html>
   <body>
     <h1>Halaman Saya</h1>
-    <script>
-      console.log("Skrip berjalan!");
-    </script>
+    <script src="app.js"></script>
   </body>
 </html>
 ```
 
-Biasanya kode ditaruh di file terpisah `.js` lalu dihubungkan:
+Namun di proyek React modern (dengan **Vite**), kamu jarang menulis HTML seperti ini. Struktur proyek sudah diatur, dan kamu menulis kode di file `.jsx`. Perintah `npm run dev` menjalankan server pengembangan.
 
-```html
-<script src="app.js"></script>
-```
-
-## Komentar
+## Komentar & Titik Koma
 
 ```javascript
 // komentar satu baris
@@ -48,15 +59,15 @@ Biasanya kode ditaruh di file terpisah `.js` lalu dihubungkan:
   komentar
   banyak baris
 */
+
+let x = 5;   // titik koma di akhir pernyataan
 ```
 
-## Titik Koma
-
-JavaScript memakai titik koma `;` di akhir pernyataan. Sebenarnya bersifat opsional (dimasukkan otomatis), tetapi kebiasaan menuliskannya membuat kode lebih aman dan jelas.
+Titik koma bersifat opsional (JavaScript menyisipkannya otomatis), tetapi kebiasaan menuliskannya membuat kode lebih aman dan konsisten.
 
 ## Ringkasan
 
-- JavaScript adalah bahasa utama web, jalan di browser dan server (Node.js).
-- `console.log()` menampilkan output ke konsol.
-- Kode bisa ditulis langsung dalam tag `<script>` atau file `.js` terpisah.
-- Komentar memakai `//` atau `/* */`.
+- JavaScript adalah bahasa utama web dan **fondasi React**.
+- Berjalan di browser dan di server (Node.js).
+- `console.log()` menampilkan output; sangat berguna untuk debugging.
+- Di proyek React, kamu menulis kode `.jsx` dan menjalankannya dengan Vite.

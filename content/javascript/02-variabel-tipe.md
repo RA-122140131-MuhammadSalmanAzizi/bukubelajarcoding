@@ -1,20 +1,29 @@
 # Variabel & Tipe Data
 
-Berbeda dengan Python, di JavaScript kamu mendeklarasikan variabel dengan kata kunci `let` atau `const`.
+Variabel adalah wadah bernama untuk menyimpan nilai. Di JavaScript modern, kamu membuatnya dengan `let` atau `const`.
 
 ## let dan const
 
 ```javascript
-let umur = 22;          // bisa diubah nanti
+let umur = 22;          // nilai bisa diubah nanti
 umur = 23;              // boleh
 
-const nama = "Salman";  // tetap, tidak bisa diubah
+const nama = "Salman";  // nilai tetap, tidak bisa diubah
 // nama = "Budi";       // Error
 ```
 
-> Tip: gunakan `const` sebagai default. Pakai `let` hanya jika nilainya memang perlu berubah. Hindari kata kunci lama `var` karena perilakunya membingungkan.
+Aturan praktis:
+- Gunakan **`const` sebagai default**.
+- Pakai **`let`** hanya jika nilainya memang perlu berubah.
+- **Hindari `var`** (kata kunci lama) karena perilakunya membingungkan.
+
+> Dipakai di React: hampir semua deklarasi di React memakai `const` — termakuk komponen, hasil `useState`, dan fungsi. Contoh dari kode: `const [session, setSession] = useState(null);`
+
+<!--page-->
 
 ## Tipe Data Dasar
+
+JavaScript menentukan tipe secara otomatis dari nilainya.
 
 ```javascript
 let teks = "halo";        // string
@@ -22,7 +31,7 @@ let angka = 42;           // number (tidak ada pembeda int/float)
 let desimal = 3.14;       // number juga
 let aktif = true;         // boolean
 let kosong = null;        // sengaja kosong
-let belumAda;             // undefined (belum diberi nilai)
+let belumAda;             // undefined (dideklarasi tapi belum diisi)
 ```
 
 | Tipe | Contoh |
@@ -30,8 +39,9 @@ let belumAda;             // undefined (belum diberi nilai)
 | string | `"halo"`, `'a'` |
 | number | `42`, `3.14` |
 | boolean | `true`, `false` |
-| null | `null` |
-| undefined | variabel belum diisi |
+| null | `null` (kosong disengaja) |
+| undefined | belum diberi nilai |
+| object | `{}`, `[]` (dibahas di bab tersendiri) |
 
 Cek tipe dengan `typeof`:
 
@@ -41,39 +51,51 @@ typeof 42        // "number"
 typeof true      // "boolean"
 ```
 
-## String dan Template Literal
+### null vs undefined
 
-Gabungkan teks dan variabel dengan backtick dan `${ }` (mirip f-string Python):
+- `undefined` = variabel ada tapi belum diberi nilai.
+- `null` = sengaja dikosongkan oleh programmer.
 
-```javascript
-const nama = "Salman";
-const umur = 22;
-console.log(`Namaku ${nama}, umur ${umur} tahun.`);
-// Namaku Salman, umur 22 tahun.
-```
+> Dipakai di React: `useState(null)` sering dipakai untuk state yang "belum ada isinya", misalnya data pengguna sebelum selesai dimuat.
+
+<!--page-->
 
 ## Konversi Tipe
 
 ```javascript
 Number("22")      // 22
 String(22)        // "22"
-parseInt("22px")  // 22 (ambil angka di awal)
+parseInt("22px")  // 22   (mengambil angka di awal)
+parseFloat("3.14em") // 3.14
+Boolean(0)        // false
 ```
 
-> Hati-hati: `+` bisa berarti tambah ATAU gabung teks. `"2" + 2` menghasilkan `"22"` (teks), bukan `4`. Pastikan tipenya sesuai.
+> Hati-hati: operator `+` bisa berarti tambah ATAU gabung teks. `"2" + 2` menghasilkan `"22"` (teks), bukan `4`. Pastikan tipenya sesuai sebelum berhitung.
 
-## Perbandingan: == vs ===
+## Nilai "Falsy"
+
+Nilai berikut dianggap `false` di dalam kondisi:
 
 ```javascript
-5 == "5"     // true  (membandingkan nilai saja, mengabaikan tipe)
-5 === "5"    // false (membandingkan nilai DAN tipe)
+false, 0, "", null, undefined, NaN
 ```
 
-> Penting: selalu gunakan `===` dan `!==` (tiga tanda). Ini lebih aman karena tidak diam-diam mengubah tipe.
+Selain itu dianggap `true` (truthy). Ini penting karena sangat sering dipakai:
+
+```javascript
+const nama = "";
+if (nama) {
+  console.log("ada nama");
+} else {
+  console.log("nama kosong");   // ini yang jalan, karena "" falsy
+}
+```
+
+> Dipakai di React: pengecekan truthy/falsy dipakai untuk menampilkan sesuatu secara kondisional, misalnya `{user && <Profil user={user} />}` — komponen hanya tampil jika `user` ada.
 
 ## Ringkasan
 
-- Deklarasi variabel dengan `const` (default) atau `let` (jika perlu berubah).
-- Angka tidak dibedakan int/float, semuanya `number`.
-- Template literal `` `${variabel}` `` untuk menggabung teks.
-- Gunakan `===` untuk perbandingan, bukan `==`.
+- Deklarasi variabel dengan `const` (default) atau `let` (bila perlu berubah); hindari `var`.
+- Tipe dasar: string, number, boolean, null, undefined, object.
+- Angka tidak dibedakan int/float — semuanya `number`.
+- Pahami nilai falsy (`0`, `""`, `null`, `undefined`) karena sering dipakai di kondisi dan JSX.
