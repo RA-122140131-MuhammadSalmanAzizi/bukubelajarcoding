@@ -522,10 +522,12 @@ el("installBtn").addEventListener("click", async () => {
     );
     return;
   }
+  // Desktop/Android tanpa prompt = sudah terpasang atau belum memenuhi syarat
   alert(
-    "Aplikasi belum bisa dipasang otomatis di browser ini.\n\n" +
-    "Pastikan situs dibuka lewat alamat HTTPS (bukan localhost), lalu cek menu browser untuk opsi \"Install\" / \"Tambahkan ke Layar Utama\"."
+    "Aplikasi kemungkinan sudah terpasang. Cek ikon aplikasinya di menu/desktop.\n\n" +
+    "Di Chrome desktop, opsi install ada di ikon di ujung kanan bilah alamat (gambar monitor dengan panah ke bawah)."
   );
+  el("installBtn").hidden = true;
 });
 
 if ("serviceWorker" in navigator) {
