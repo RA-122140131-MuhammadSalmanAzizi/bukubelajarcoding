@@ -78,6 +78,7 @@ const BOOK = [
       { id: "10-custom-hooks", judul: "10. Custom Hooks" },
       { id: "11-router", judul: "11. React Router" },
       { id: "12-library", judul: "12. Library Ekosistem React" },
+      { id: "13-best-practices", judul: "13. Best Practices & Struktur Proyek" },
     ],
   },
   {
