@@ -48,6 +48,9 @@ const BOOK = [
       { id: "06-fungsi", judul: "6. Fungsi & Arrow Function" },
       { id: "07-array", judul: "7. Array & Method Penting" },
       { id: "08-object", judul: "8. Object" },
+      { id: "09-destructuring", judul: "9. Destructuring, Spread & Rest" },
+      { id: "10-modules", judul: "10. ES Modules (import/export)" },
+      { id: "11-async", judul: "11. Async: Promise & await" },
     ],
   },
   {
