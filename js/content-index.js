@@ -59,6 +59,20 @@ const BOOK = [
     ],
   },
   {
+    id: "react",
+    nama: "React",
+    mark: "Re",
+    color: "#087ea4",
+    logo: "aset/logos/react.svg",
+    deskripsi: "Library JavaScript untuk membangun antarmuka web. Materi lengkap & mendalam, dari instalasi sampai hooks, sesuai proyek React sungguhan.",
+    pelajaran: [
+      { id: "01-instalasi", judul: "1. Instalasi & Setup Proyek" },
+      { id: "02-jsx", judul: "2. JSX" },
+      { id: "03-komponen-props", judul: "3. Komponen & Props" },
+      { id: "04-usestate", judul: "4. State dengan useState" },
+    ],
+  },
+  {
     id: "cpp",
     nama: "C++",
     mark: "C++",
