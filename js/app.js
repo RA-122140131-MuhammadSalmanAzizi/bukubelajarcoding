@@ -389,20 +389,36 @@ function setActive(key) {
 function buildPager(langId, lessonId, cur, total) {
   const idx = FLAT.findIndex((f) => f.langId === langId && f.lessonId === lessonId);
 
-  // Sebelumnya: halaman sebelumnya di bab ini, atau bab sebelumnya
-  let prevHash = null;
-  if (cur > 1) prevHash = `${langId}/${lessonId}/${cur - 1}`;
-  else if (FLAT[idx - 1]) prevHash = `${FLAT[idx - 1].langId}/${FLAT[idx - 1].lessonId}`;
-  // Selanjutnya: halaman berikutnya di bab ini, atau bab berikutnya
-  let nextHash = null;
-  if (cur < total) nextHash = `${langId}/${lessonId}/${cur + 1}`;
-  else if (FLAT[idx + 1]) nextHash = `${FLAT[idx + 1].langId}/${FLAT[idx + 1].lessonId}`;
+  // Aksi "Sebelumnya"
+  let prevAction = null;
+  if (cur > 1) {
+    const h = `${langId}/${lessonId}/${cur - 1}`;          // halaman sebelumnya di bab ini
+    prevAction = () => { location.hash = h; };
+  } else if (FLAT[idx - 1]) {
+    const p = FLAT[idx - 1];                                // bab sebelumnya -> HALAMAN TERAKHIRNYA
+    prevAction = async () => {
+      const pages = await getPages(p.langId, p.lessonId);
+      const last = pages.length || 1;
+      location.hash = last > 1 ? `${p.langId}/${p.lessonId}/${last}` : `${p.langId}/${p.lessonId}`;
+    };
+  }
+
+  // Aksi "Selanjutnya"
+  let nextAction = null;
+  if (cur < total) {
+    const h = `${langId}/${lessonId}/${cur + 1}`;          // halaman berikutnya di bab ini
+    nextAction = () => { location.hash = h; };
+  } else if (FLAT[idx + 1]) {
+    const n = FLAT[idx + 1];                                // bab berikutnya -> halaman pertamanya
+    const h = `${n.langId}/${n.lessonId}`;
+    nextAction = () => { location.hash = h; };
+  }
 
   // Terapkan ke pager atas ("Top") dan bawah ("")
   const apply = (sfx) => {
     const P = el("prevBtn" + sfx), N = el("nextBtn" + sfx), I = el("pageInd" + sfx);
-    if (P) { P.hidden = !prevHash; if (prevHash) P.onclick = () => { location.hash = prevHash; }; }
-    if (N) { N.hidden = !nextHash; if (nextHash) N.onclick = () => { location.hash = nextHash; }; }
+    if (P) { P.hidden = !prevAction; P.onclick = prevAction; }
+    if (N) { N.hidden = !nextAction; N.onclick = nextAction; }
     if (I) { I.textContent = total > 1 ? `${cur} / ${total}` : ""; I.hidden = total <= 1; }
   };
   apply("");
