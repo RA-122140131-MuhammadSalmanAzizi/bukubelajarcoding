@@ -339,6 +339,15 @@ async function loadLesson(langId, lessonId, page) {
   window.scrollTo(0, 0);
 }
 
+// Ambil judul subbab pertama (H2) sebuah halaman untuk label di sidebar
+function pageTitle(md, i) {
+  const h2 = md.match(/^##\s+(.+?)\s*$/m);
+  if (h2) return h2[1].trim();
+  const h1 = md.match(/^#\s+(.+?)\s*$/m);
+  if (h1) return h1[1].trim();
+  return `Halaman ${i}`;
+}
+
 // Isi daftar halaman sebuah bab di sidebar (dari cache)
 function fillPages(cont, langId, lessonId) {
   markActivePage();
@@ -347,9 +356,11 @@ function fillPages(cont, langId, lessonId) {
   const n = pages.length || 1;
   cont.innerHTML = "";
   for (let i = 1; i <= n; i++) {
+    const label = pages.length ? pageTitle(pages[i - 1], i) : `Halaman ${i}`;
     const b = document.createElement("button");
     b.className = "nav-page";
-    b.textContent = `Halaman ${i}`;
+    b.textContent = label;
+    b.title = label; // tooltip lengkap saat hover
     b.dataset.hash = i === 1 ? `${langId}/${lessonId}` : `${langId}/${lessonId}/${i}`;
     b.addEventListener("click", () => { location.hash = b.dataset.hash; });
     cont.appendChild(b);
