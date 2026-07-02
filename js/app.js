@@ -12,18 +12,7 @@ const ICONS = {
   check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
   code: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
   copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',
-  pagerPrev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>',
-  pagerNext: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
 };
-
-// Markup pager (dipakai di atas artikel; yang bawah statis di HTML)
-function pagerHTML(sfx) {
-  return `<nav class="pager pager-top">` +
-    `<button id="prevBtn${sfx}" class="pager-btn" hidden>${ICONS.pagerPrev}<span>Sebelumnya</span></button>` +
-    `<span id="pageInd${sfx}" class="page-ind" hidden></span>` +
-    `<button id="nextBtn${sfx}" class="pager-btn" hidden><span>Selanjutnya</span>${ICONS.pagerNext}</button>` +
-    `</nav>`;
-}
 
 const FEATURES = [
   { t: "Responsif", d: "Nyaman dibaca di ponsel maupun desktop.", i: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="2" y="2" rx="2"/><path d="M14 2v20"/><path d="M18 8h4v10a2 2 0 0 1-2 2h-2"/></svg>' },
@@ -100,13 +89,37 @@ function buildNav() {
     list.dataset.lang = lang.id;
 
     lang.pelajaran.forEach((p) => {
+      const row = document.createElement("div");
+      row.className = "nav-lesson-row";
+
       const a = document.createElement("button");
       a.className = "nav-lesson";
       a.textContent = p.judul;
       a.dataset.lang = lang.id;
       a.dataset.lesson = p.id;
       a.addEventListener("click", () => { location.hash = `${lang.id}/${p.id}`; });
-      list.appendChild(a);
+
+      const tog = document.createElement("button");
+      tog.className = "nav-lesson-toggle";
+      tog.setAttribute("aria-label", "Lihat daftar halaman");
+      tog.innerHTML = ICONS.chevron;
+
+      const pagesCont = document.createElement("div");
+      pagesCont.className = "nav-pages";
+      pagesCont.dataset.lang = lang.id;
+      pagesCont.dataset.lesson = p.id;
+
+      tog.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const open = pagesCont.classList.toggle("open");
+        tog.classList.toggle("open", open);
+        if (open) { await getPages(lang.id, p.id); fillPages(pagesCont, lang.id, p.id); }
+      });
+
+      row.appendChild(a);
+      row.appendChild(tog);
+      list.appendChild(row);
+      list.appendChild(pagesCont);
     });
 
     btn.addEventListener("click", () => {
@@ -249,11 +262,25 @@ function renderHome() {
 }
 
 /* ---------- Muat pelajaran (dengan paging per-bab) ---------- */
-let LESSON = { key: null, pages: [] };
+const pageCache = {};
 
 // Pisah materi jadi halaman berdasar penanda <!--page-->
 function splitPages(md) {
   return md.split(/^\s*<!--\s*page\s*-->\s*$/m).map((s) => s.trim()).filter(Boolean);
+}
+
+// Ambil (dan cache) daftar halaman sebuah bab
+async function getPages(langId, lessonId) {
+  const key = `${langId}/${lessonId}`;
+  if (pageCache[key]) return pageCache[key];
+  try {
+    const res = await fetch(`content/${langId}/${lessonId}.md`);
+    if (!res.ok) throw new Error(res.status);
+    pageCache[key] = splitPages(await res.text());
+  } catch (e) {
+    pageCache[key] = [];
+  }
+  return pageCache[key];
 }
 
 async function loadLesson(langId, lessonId, page) {
@@ -262,45 +289,81 @@ async function loadLesson(langId, lessonId, page) {
   if (!lesson) { renderHome(); return; }
 
   document.body.dataset.view = "app";
-  const key = `${langId}/${lessonId}`;
-
-  // Ambil & cache isi bab; kalau pindah halaman di bab yang sama, tak perlu fetch ulang
-  if (LESSON.key !== key) {
+  if (!pageCache[`${langId}/${lessonId}`]) {
     article.innerHTML = `<p style="color:var(--text-muted)">Memuat…</p>`;
-    try {
-      const res = await fetch(`content/${langId}/${lessonId}.md`);
-      if (!res.ok) throw new Error(res.status);
-      LESSON = { key, pages: splitPages(await res.text()) };
-    } catch (e) {
-      LESSON = { key, pages: [] };
-    }
   }
-
-  const total = LESSON.pages.length || 1;
+  const pages = await getPages(langId, lessonId);
+  const total = pages.length || 1;
   const cur = Math.min(Math.max(parseInt(page) || 1, 1), total);
 
-  if (LESSON.pages.length) {
+  if (pages.length) {
     const meta = total > 1 ? `${lang.nama} &middot; Halaman ${cur} dari ${total}` : lang.nama;
     const judul = lesson.judul.replace(/^\d+\.\s*/, "");
-    const pageMd = LESSON.pages[cur - 1].replace(/^#\s+.*\n?/, ""); // buang H1 (diganti judul tetap di atas)
+    const pageMd = pages[cur - 1].replace(/^#\s+.*\n?/, ""); // buang H1 (diganti judul tetap di atas)
     article.innerHTML =
-      `<div class="lesson-head"><div class="lesson-meta">${meta}</div><h1 class="lesson-title">${judul}</h1></div>` +
-      pagerHTML("Top") +
+      `<div class="lesson-head">` +
+        `<div class="lesson-head-top">` +
+          `<div class="lesson-meta">${meta}</div>` +
+          `<div class="page-nav-top">` +
+            `<a class="page-link" id="prevBtnTop">Sebelumnya</a>` +
+            `<a class="page-link" id="nextBtnTop">Selanjutnya</a>` +
+          `</div>` +
+        `</div>` +
+        `<h1 class="lesson-title">${judul}</h1>` +
+      `</div>` +
       `<div class="lesson-body">${MD.render(pageMd)}</div>`;
   } else {
     article.innerHTML = `<h1>Materi belum tersedia</h1><p>Pelajaran ini sedang disiapkan. Silakan pilih pelajaran lain dari menu.</p>`;
   }
   document.title = `${lesson.judul} — Buku Belajar Coding`;
 
-  setActive(key);
+  setActive(`${langId}/${lessonId}`);
   buildPager(langId, lessonId, cur, total);
+
+  // Buka grup bahasa + daftar halaman bab aktif di sidebar
   const listAktif = nav.querySelector(`.nav-lessons[data-lang="${langId}"]`);
-  if (listAktif && !listAktif.classList.contains("open")) {
+  if (listAktif) {
     listAktif.classList.add("open");
     listAktif.previousElementSibling.classList.add("open");
   }
+  const cont = nav.querySelector(`.nav-pages[data-lang="${langId}"][data-lesson="${lessonId}"]`);
+  if (cont) {
+    cont.classList.add("open");
+    const tog = cont.previousElementSibling.querySelector(".nav-lesson-toggle");
+    if (tog) tog.classList.add("open");
+    fillPages(cont, langId, lessonId);
+  }
+  markActivePage();
+
   closeSidebar();
   window.scrollTo(0, 0);
+}
+
+// Isi daftar halaman sebuah bab di sidebar (dari cache)
+function fillPages(cont, langId, lessonId) {
+  markActivePage();
+  if (cont.dataset.filled) return;
+  const pages = pageCache[`${langId}/${lessonId}`] || [];
+  const n = pages.length || 1;
+  cont.innerHTML = "";
+  for (let i = 1; i <= n; i++) {
+    const b = document.createElement("button");
+    b.className = "nav-page";
+    b.textContent = `Halaman ${i}`;
+    b.dataset.hash = i === 1 ? `${langId}/${lessonId}` : `${langId}/${lessonId}/${i}`;
+    b.addEventListener("click", () => { location.hash = b.dataset.hash; });
+    cont.appendChild(b);
+  }
+  cont.dataset.filled = "1";
+  markActivePage();
+}
+
+// Tandai halaman aktif di sidebar
+function markActivePage() {
+  const [a, b, p] = location.hash.replace(/^#/, "").split("/");
+  const norm = a && b ? (p && p !== "1" ? `${a}/${b}/${p}` : `${a}/${b}`) : "";
+  document.querySelectorAll(".nav-page").forEach((btn) =>
+    btn.classList.toggle("active", btn.dataset.hash === norm));
 }
 
 function setActive(key) {
@@ -356,7 +419,11 @@ el("searchInput").addEventListener("input", (e) => {
     let adaCocok = false;
     list.querySelectorAll(".nav-lesson").forEach((a) => {
       const cocok = a.textContent.toLowerCase().includes(q) || lang.nama.toLowerCase().includes(q);
-      a.style.display = cocok || !q ? "" : "none";
+      const show = cocok || !q;
+      const row = a.closest(".nav-lesson-row");
+      if (row) row.style.display = show ? "" : "none";
+      const pg = row && row.nextElementSibling;
+      if (pg && pg.classList.contains("nav-pages")) pg.style.display = show ? "" : "none";
       if (cocok) adaCocok = true;
     });
     if (q) {
